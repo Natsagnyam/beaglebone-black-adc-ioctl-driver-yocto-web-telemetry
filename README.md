@@ -4,6 +4,14 @@ A Linux **miscellaneous character device driver** for the BeagleBone Black (TI A
 
 > **Project status:** The ADC + C userspace application + custom `ioctl()` driver have been tested on a BeagleBone Black. **Web telemetry and Yocto packaging are planned**, not part of the verified implementation described here.
 
+http://192.168.7.2:8000/
+BBB_Hz_gauge:
+![BBB_Hz_gauge.png](jpeg/BBB_Hz_gauge.png)
+
+http://192.168.7.2:8000/api/frequency
+![BBB_Hz_gauge.png](jpeg/ADC_telemetry.png)
+
+
 Test Result:
 ioctl_ADC
 ![ioctl_ADC](jpeg/ioctl_ADC.png)
