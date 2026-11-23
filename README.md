@@ -357,3 +357,31 @@ This project is licensed under the **GNU General Public License v2.0 only (GPL-2
 You may use, study, modify, and redistribute the software under the terms of the GPL-2.0 license.
 
 See the [LICENSE](LICENSE) file for the complete license terms.
+## Simulation & Virtual POT Mode (No Hardware Required)
+
+You can run the web dashboard and telemetry API without a BeagleBone Black or physical ADC potentiometer. When `/dev/bbb_freq` is absent—or when `MOCK_TELEMETRY=1` is set—`simulated-bbb-web-server.py` automatically runs in simulated mode and exposes an interactive **Virtual POT (AIN0)** control on the dashboard.
+
+### Quick Start in Simulation Mode
+
+```bash
+cd ~/bbb_freq_driver/web
+MOCK_TELEMETRY=1 python3 simulated-bbb-web-server.py
+Open http://127.0.0.1:8000/ (or your LAN / Tailscale IP on port 8000, e.g., http://192.168.68.108:8000/ or http://100.114.205.29:8000/).
+
+Using the Virtual POT & Telemetry API
+Interactive Dashboard Controls: Drag the Virtual POT (AIN0) slider (0–4095 ADC counts) to sweep simulated frequency between 45.000 Hz and 65.000 Hz, use the preset buttons (50 Hz, 55 Hz, 60 Hz), or click Auto Wave to return to automatic sine-wave simulation (~50 Hz).
+
+Set Virtual POT via HTTP API:
+
+Bash
+curl -sS -X POST -H "Content-Type: application/json" \
+  -d '{"adc_raw": 2048}' \
+  [http://127.0.0.1:8000/api/pot](http://127.0.0.1:8000/api/pot)
+Reset to Auto Wave via HTTP API:
+
+Bash
+curl -sS -X POST [http://127.0.0.1:8000/api/pot/reset](http://127.0.0.1:8000/api/pot/reset)
+Poll Current Telemetry:
+
+Bash
+curl -sS [http://127.0.0.1:8000/api/frequency](http://127.0.0.1:8000/api/frequency)
