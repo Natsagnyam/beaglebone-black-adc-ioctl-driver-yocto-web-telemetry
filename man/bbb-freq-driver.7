@@ -1,0 +1,94 @@
+.TH BBB-FREQ-DRIVER 7 "November 2026" "bbb-freq-driver 0.1.0" "BeagleBone Black Kernel & Telemetry Manual"
+.SH NAME
+bbb-freq-driver \- BeagleBone Black ADC frequency character device driver, DKMS package, and Virtual POT telemetry dashboard
+.SH SYNOPSIS
+.B modprobe freq_driver
+.br
+.B MOCK_TELEMETRY=1 python3 web/simulated-bbb-web-server.py
+.SH DESCRIPTION
+.B bbb-freq-driver
+provides an out-of-tree Linux kernel character device driver
+.RI ( freq_driver.ko ,
+exposing
+.IR /dev/bbb_freq )
+packaged via DKMS for Debian/Ubuntu on ARMv7 BeagleBone Black hardware, alongside a zero-dependency Python HTTP telemetry server and browser gauge dashboard with an interactive Virtual POT simulator.
+.SH ARCHITECTURE
+.TP
+.B Kernel Space (freq_driver.ko)
+Registers character device
+.I /dev/bbb_freq
+and exposes raw ADC0 counts and scaled frequency measurements (45.000 Hz to 65.000 Hz) via
+.BR read (2)
+and
+.BR ioctl (2)
+interfaces defined in
+.IR freq_ioctl.h .
+.TP
+.B Userspace Telemetry Bridge (web/simulated-bbb-web-server.py)
+Serves the live web dashboard on TCP port 8000 and exposes JSON REST endpoints:
+.RS
+.IP \(bu 2
+.B GET /api/frequency
+\- Returns
+.IR adc_raw ,
+.IR frequency_hz ,
+.IR timestamp_ms ,
+and
+.IR mode .
+.IP \(bu 2
+.B POST /api/pot
+\- Overrides simulated ADC input with JSON
+.B {"adc_raw": 0..4095}
+or
+.B {"pot": 0.0..1.0} .
+.IP \(bu 2
+.B POST /api/pot/reset
+\- Returns simulated telemetry to automatic sine-wave mode (~50 Hz).
+.RE
+.TP
+.B Simulation Fallback Mode
+When
+.I /dev/bbb_freq
+is absent or
+.B MOCK_TELEMETRY=1
+is set, the server automatically switches to simulated/Virtual POT mode so developers can evaluate the dashboard without physical hardware.
+.SH ENVIRONMENT
+.TP
+.B MOCK_TELEMETRY
+Set to
+.B 1
+to force simulated and Virtual POT telemetry even if
+.I /dev/bbb_freq
+exists.
+.TP
+.B BBB_FREQ_DEVICE
+Override character device path (default:
+.IR /dev/bbb_freq ).
+.TP
+.B DASHBOARD_HOST
+Bind address for the HTTP server (default:
+.IR 0.0.0.0 ).
+.TP
+.B DASHBOARD_PORT
+TCP listening port for the HTTP server (default:
+.IR 8000 ).
+.SH FILES
+.TP
+.I /dev/bbb_freq
+Character device node created when
+.B freq_driver
+is loaded.
+.TP
+.I web/simulated-bbb-web-server.py
+Python 3 standard-library HTTP server and telemetry API.
+.TP
+.I web/index.html
+SVG frequency gauge (45\(en65 Hz) and Virtual POT (AIN0) slider UI.
+.SH AUTHOR
+Written by Natska (Natsagnyam NAMKHAI).
+.SH LICENSE
+GNU General Public License v2.0 (GPL-2.0).
+.SH SEE ALSO
+.BR modprobe (8),
+.BR dkms (8),
+.BR ioctl (2)
