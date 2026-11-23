@@ -1,0 +1,5 @@
+bbb-freq-driver (0.1.0) noble; urgency=medium
+
+  * Initial Debian DKMS packaging for freq_driver.
+
+ -- Natsagnyam Namkhai <nanyam22@gmail.com>  Mon, 23 Nov 2026 19:01:00 +0800
